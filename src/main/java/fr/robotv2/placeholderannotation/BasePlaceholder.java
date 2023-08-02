@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BasePlaceholder {
 
@@ -86,7 +87,11 @@ public class BasePlaceholder {
         }
 
         try {
+
             PAPUtil.debug("invoking");
+            PAPUtil.debug(String.join(", ", params));
+            PAPUtil.debug(Arrays.stream(objects).map(object -> object.getClass().getSimpleName()).collect(Collectors.joining(", ")));
+
             final Object result = method.invoke(
                     this.expansionClazz,
                     objects

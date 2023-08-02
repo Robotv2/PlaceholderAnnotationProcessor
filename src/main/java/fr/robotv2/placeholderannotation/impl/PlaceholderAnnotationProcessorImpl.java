@@ -60,7 +60,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
 
             if(!method.isAnnotationPresent(Placeholder.class)) {
                 PAPUtil.debug("Method '" + method.getName() + "' has no Placeholder annotation, skipping...");
-                return;
+                continue;
             }
 
             PAPUtil.debug("method found ! : " + method.getName());

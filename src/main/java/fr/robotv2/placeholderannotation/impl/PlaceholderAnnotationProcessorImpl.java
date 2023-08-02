@@ -23,6 +23,10 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
     private final Map<Class<?>, ValueResolver<?>> resolvers = new HashMap<>();
     private final Map<String, BasePlaceholder> placeholders = new HashMap<>();
 
+    public PlaceholderAnnotationProcessorImpl() {
+        this.registerDefaultValueResolver();
+    }
+
     @Override
     public <T> ValueResolver<T> getValueResolver(Class<T> clazz) {
 

@@ -1,9 +1,6 @@
 package fr.robotv2.placeholderannotation.impl;
 
-import fr.robotv2.placeholderannotation.BasePlaceholder;
-import fr.robotv2.placeholderannotation.BasePlaceholderExpansion;
-import fr.robotv2.placeholderannotation.PAPUtil;
-import fr.robotv2.placeholderannotation.PlaceholderAnnotationProcessor;
+import fr.robotv2.placeholderannotation.*;
 import fr.robotv2.placeholderannotation.annotations.Placeholder;
 import fr.robotv2.placeholderannotation.interfaces.ValueResolver;
 import org.bukkit.Bukkit;
@@ -98,6 +95,11 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
 
 
     private void checkType(Class<?> type) {
+
+        if(type == RequestIssuer.class) {
+            return;
+        }
+
         if(type.isPrimitive()) {
             throw new IllegalArgumentException("PAP does not support primitive types.");
         }

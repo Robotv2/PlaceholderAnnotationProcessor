@@ -2,11 +2,13 @@ package fr.robotv2.placeholderannotation;
 
 import com.google.common.base.Enums;
 import fr.robotv2.placeholderannotation.impl.RequestIssuerImpl;
+import fr.robotv2.placeholderannotation.interfaces.ValueResolver;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -53,12 +55,12 @@ public class BasePlaceholder {
             return null;
         }
 
-        if(params.length != getTypes().length) {
-            PAPUtil.debug("param's length && type's length are not the same.");
+        if(params.length != getTypes().length - 1) {
+            PAPUtil.debug("param's length & type's length are not the same.");
             return null;
         }
 
-        final Class<?>[] types = getTypes();
+        final Class<?>[] types = Arrays.copyOfRange(getTypes(), 1, getTypes().length);
         final Object[] objects = new Object[params.length + 1];
         objects[0] = new RequestIssuerImpl(offlinePlayer);
 
@@ -78,10 +80,14 @@ public class BasePlaceholder {
 
                 object = values.get(param.toLowerCase(Locale.ROOT));
             } else {
-                object = processor.getValueResolver(type).resolver(param);
+                final ValueResolver<?> resolver = processor.getValueResolver(type);
+                if(resolver == null) {
+                    throw new NullPointerException("resolver couldn't be found for " + param);
+                }
+                object = resolver.resolver(param);
             }
 
-            objects[i + 1] = object;
+            objects[i] = object;
         }
 
         try {

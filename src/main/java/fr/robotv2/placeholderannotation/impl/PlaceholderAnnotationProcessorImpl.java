@@ -86,11 +86,16 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
         final String identifier = args[0];
 
         if(!placeholders.containsKey(identifier)) {
+            PAPUtil.debug("No identifier found for : " + identifier);
             return null;
         }
 
         final BasePlaceholder basePlaceholder = placeholders.get(identifier);
-        return basePlaceholder.process(offlinePlayer, Arrays.copyOfRange(args, 1, args.length));
+        final String[] paramsArgs = Arrays.copyOfRange(args, 1, args.length);
+
+        PAPUtil.debug("Args Found : " + String.join(", ", paramsArgs));
+
+        return basePlaceholder.process(offlinePlayer, paramsArgs);
     }
 
 

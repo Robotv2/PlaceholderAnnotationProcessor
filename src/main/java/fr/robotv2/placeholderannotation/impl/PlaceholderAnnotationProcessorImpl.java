@@ -48,8 +48,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
     @Override
     public void register(BasePlaceholderExpansion basePlaceholderExpansion) {
 
-        final Class<? extends BasePlaceholderExpansion> expansionClazz = basePlaceholderExpansion.getClass();
-        final Method[] methods = expansionClazz.getDeclaredMethods();
+        final Method[] methods = basePlaceholderExpansion.getClass().getDeclaredMethods();
 
         PAPUtil.debug("Register expansion. Found " + methods.length + " methods.");
 
@@ -71,7 +70,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
             final BasePlaceholder basePlaceholder = new BasePlaceholder(
                     this,
                     identifier,
-                    expansionClazz,
+                    basePlaceholderExpansion,
                     method
             );
 

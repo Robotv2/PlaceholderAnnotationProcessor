@@ -1,9 +1,7 @@
 package fr.robotv2.placeholderannotation;
 
-import com.google.common.base.Enums;
 import fr.robotv2.placeholderannotation.impl.RequestIssuerImpl;
 import fr.robotv2.placeholderannotation.interfaces.ValueResolver;
-import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,22 +10,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class BasePlaceholder {
 
     private final PlaceholderAnnotationProcessor processor;
 
     private final String identifier;
-    private final Class<? extends PlaceholderExpansion> expansionClazz;
+    private final BasePlaceholderExpansion expansionClazz;
     private final Method method;
-
-    private boolean debug = false;
 
     public BasePlaceholder(
             PlaceholderAnnotationProcessor processor,
             String identifier,
-            Class<? extends PlaceholderExpansion> expansionClazz,
+            BasePlaceholderExpansion expansionClazz,
             Method method
     ) {
         this.processor = processor;

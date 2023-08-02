@@ -4,10 +4,16 @@ import fr.robotv2.placeholderannotation.impl.PlaceholderAnnotationProcessorImpl;
 import fr.robotv2.placeholderannotation.interfaces.ValueResolver;
 import org.bukkit.OfflinePlayer;
 
+import java.util.logging.Logger;
+
 public interface PlaceholderAnnotationProcessor {
 
-    default PlaceholderAnnotationProcessor create() {
+    static PlaceholderAnnotationProcessor create() {
         return new PlaceholderAnnotationProcessorImpl();
+    }
+
+    static Logger logger() {
+        return Logger.getLogger("PAP");
     }
 
     <T> ValueResolver<T> getValueResolver(Class<T> clazz);

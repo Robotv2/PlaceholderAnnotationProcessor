@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class BasePlaceholder {
 
@@ -18,6 +19,8 @@ public class BasePlaceholder {
     private final String identifier;
     private final Class<? extends PlaceholderExpansion> expansionClazz;
     private final Method method;
+
+    private boolean debug = false;
 
     public BasePlaceholder(
             PlaceholderAnnotationProcessor processor,
@@ -46,10 +49,12 @@ public class BasePlaceholder {
     public String process(OfflinePlayer offlinePlayer, String[] params) {
 
         if(params == null) {
+            PAPUtil.debug("params is null");
             return null;
         }
 
         if(params.length != getTypes().length) {
+            PAPUtil.debug("param's length && type's length are not the same.");
             return null;
         }
 
@@ -80,6 +85,7 @@ public class BasePlaceholder {
         }
 
         try {
+            PAPUtil.debug("invoking");
             final Object result = method.invoke(
                     this.expansionClazz,
                     objects
@@ -89,6 +95,7 @@ public class BasePlaceholder {
                 throw new IllegalStateException(method.getName() + " return type is not a string. found: " + result.getClass().getSimpleName());
             }
 
+            PAPUtil.debug("result here");
             return (String) result;
         } catch (IllegalAccessException | InvocationTargetException | ClassCastException exception) {
             exception.printStackTrace();

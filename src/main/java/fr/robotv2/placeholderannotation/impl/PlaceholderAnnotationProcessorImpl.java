@@ -2,6 +2,7 @@ package fr.robotv2.placeholderannotation.impl;
 
 import fr.robotv2.placeholderannotation.BasePlaceholder;
 import fr.robotv2.placeholderannotation.BasePlaceholderExpansion;
+import fr.robotv2.placeholderannotation.PAPUtil;
 import fr.robotv2.placeholderannotation.PlaceholderAnnotationProcessor;
 import fr.robotv2.placeholderannotation.annotations.Placeholder;
 import fr.robotv2.placeholderannotation.interfaces.ValueResolver;
@@ -49,12 +50,15 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
         final Class<? extends BasePlaceholderExpansion> expansionClazz = basePlaceholderExpansion.getClass();
         final Method[] methods = expansionClazz.getDeclaredMethods();
 
+        PAPUtil.debug("Register expansion. Found " + methods.length + " methods.");
+
         for(Method method : methods) {
 
             if(!method.isAnnotationPresent(Placeholder.class)) {
                 return;
             }
 
+            PAPUtil.debug("method found ! : " + method.getName());
             final Class<?>[] types = method.getParameterTypes();
 
             for(Class<?> type : types) {
@@ -68,10 +72,10 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
                     expansionClazz,
                     method
             );
+
+            PAPUtil.debug("Registering placeholder");
             this.placeholders.put(identifier, basePlaceholder);
         }
-
-        basePlaceholderExpansion.register();
     }
 
     public String process(OfflinePlayer offlinePlayer, String params) {

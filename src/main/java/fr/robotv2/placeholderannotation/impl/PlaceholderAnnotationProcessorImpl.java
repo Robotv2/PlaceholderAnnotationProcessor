@@ -2,7 +2,7 @@ package fr.robotv2.placeholderannotation.impl;
 
 import fr.robotv2.placeholderannotation.*;
 import fr.robotv2.placeholderannotation.annotations.Placeholder;
-import fr.robotv2.placeholderannotation.interfaces.ValueResolver;
+import fr.robotv2.placeholderannotation.ValueResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -55,11 +55,9 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
         for(Method method : methods) {
 
             if(!method.isAnnotationPresent(Placeholder.class)) {
-                PAPUtil.debug("Method '" + method.getName() + "' has no Placeholder annotation, skipping...");
                 continue;
             }
 
-            PAPUtil.debug("method found ! : " + method.getName());
             final Class<?>[] types = method.getParameterTypes();
 
             for(Class<?> type : types) {
@@ -67,7 +65,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
             }
 
             final String identifier = method.getAnnotation(Placeholder.class).identifier();
-            final BasePlaceholder basePlaceholder = new BasePlaceholder(
+            final BasePlaceholder basePlaceholder = new BasePlaceholderImpl(
                     this,
                     identifier,
                     basePlaceholderExpansion,

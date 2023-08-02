@@ -1,7 +1,6 @@
 package fr.robotv2.placeholderannotation;
 
 import fr.robotv2.placeholderannotation.impl.PlaceholderAnnotationProcessorImpl;
-import fr.robotv2.placeholderannotation.interfaces.ValueResolver;
 import org.bukkit.OfflinePlayer;
 
 import java.util.logging.Logger;

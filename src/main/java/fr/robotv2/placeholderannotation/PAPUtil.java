@@ -2,7 +2,7 @@ package fr.robotv2.placeholderannotation;
 
 public class PAPUtil {
 
-    private static boolean debug;
+    private static boolean debug = false;
 
     public static void debug(boolean debug) {
         PAPUtil.debug = debug;
@@ -13,5 +13,4 @@ public class PAPUtil {
             PlaceholderAnnotationProcessor.logger().info(message);
         }
     }
-
 }

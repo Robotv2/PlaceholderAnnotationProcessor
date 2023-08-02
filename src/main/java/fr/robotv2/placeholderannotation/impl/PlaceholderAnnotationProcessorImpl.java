@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -85,7 +84,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
         }
 
         final BasePlaceholder basePlaceholder = placeholders.get(identifier);
-        return basePlaceholder.apply(offlinePlayer, Arrays.copyOfRange(args, 1, args.length));
+        return basePlaceholder.process(offlinePlayer, Arrays.copyOfRange(args, 1, args.length));
     }
 
 
@@ -94,7 +93,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
             throw new IllegalArgumentException("PAP does not support primitive types.");
         }
 
-        if(this.getValueResolver(type) == null) {
+        if(this.getValueResolver(type) == null && !type.isEnum()) {
             throw new NullPointerException("No resolver found for type class: " + type.getSimpleName());
         }
     }

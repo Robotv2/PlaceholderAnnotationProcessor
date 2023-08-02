@@ -1,11 +1,15 @@
 package fr.robotv2.placeholderannotation;
 
+import com.google.common.base.Enums;
 import fr.robotv2.placeholderannotation.impl.RequestIssuerImpl;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class BasePlaceholder {
 
@@ -39,7 +43,7 @@ public class BasePlaceholder {
         return getMethod().getParameterTypes();
     }
 
-    public String apply(OfflinePlayer offlinePlayer, String[] params) {
+    public String process(OfflinePlayer offlinePlayer, String[] params) {
 
         if(params == null) {
             return null;
@@ -54,9 +58,24 @@ public class BasePlaceholder {
         objects[0] = new RequestIssuerImpl(offlinePlayer);
 
         for(int i = 0; i < params.length; i++) {
+
             final String param = params[i];
             final Class<?> type = types[i];
-            final Object object = processor.getValueResolver(type).resolver(param);
+            final Object object;
+
+            if(type.isEnum()) {
+                final Class<? extends Enum> enumType = type.asSubclass(Enum.class);
+                Map<String, Enum<?>> values = new HashMap<>();
+
+                for (Enum<?> enumConstant : enumType.getEnumConstants()) {
+                    values.put(enumConstant.name().toLowerCase(), enumConstant);
+                }
+
+                object = values.get(param.toLowerCase(Locale.ROOT));
+            } else {
+                object = processor.getValueResolver(type).resolver(param);
+            }
+
             objects[i + 1] = object;
         }
 

@@ -90,9 +90,15 @@ public class BasePlaceholder {
 
             PAPUtil.debug("invoking");
             PAPUtil.debug(String.join(", ", params));
-            PAPUtil.debug(Arrays.stream(objects).map(object -> object.getClass().getSimpleName()).collect(Collectors.joining(", ")));
+            PAPUtil.debug(Arrays.stream(objects).map(
+                    object -> {
+                        if(object == null) return "NULL";
+                        return object.getClass().getSimpleName();
+                    }
+            ).collect(Collectors.joining(", ")));
 
-            final Object result = method.invoke(
+            final Object result = method.invoke
+                    (
                     this.expansionClazz,
                     objects
             );

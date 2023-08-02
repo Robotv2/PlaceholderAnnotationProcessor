@@ -51,7 +51,7 @@ public class BasePlaceholder {
             return null;
         }
 
-        if(params.length != getTypes().length - 1) {
+        if(params.length != (getTypes().length - 1)) {
             PAPUtil.debug("param's length & type's length are not the same.");
             return null;
         }
@@ -83,7 +83,7 @@ public class BasePlaceholder {
                 object = resolver.resolver(param);
             }
 
-            objects[i] = object;
+            objects[i + 1] = object;
         }
 
         try {

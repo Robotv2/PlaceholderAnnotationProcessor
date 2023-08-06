@@ -1,15 +1,15 @@
 package fr.robotv2.placeholderannotation;
 
-public class PAPUtil {
+public class PAPDebug {
 
     private static boolean debug = false;
 
-    public static void debug(boolean debug) {
-        PAPUtil.debug = debug;
+    public static void debugEnabled(boolean debug) {
+        PAPDebug.debug = debug;
     }
 
     public static void debug(String message) {
-        if(PAPUtil.debug) {
+        if(PAPDebug.debug) {
             PlaceholderAnnotationProcessor.logger().info(message);
         }
     }

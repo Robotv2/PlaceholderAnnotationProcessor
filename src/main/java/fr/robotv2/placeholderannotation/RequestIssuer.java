@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 public interface RequestIssuer {
 
     /**
-     * @return whether an offline player has been given.
+     * @return whether an offline player instance has been given.
      */
     boolean isConsole();
 

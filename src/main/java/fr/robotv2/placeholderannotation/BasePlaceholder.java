@@ -16,5 +16,4 @@ public interface BasePlaceholder {
     }
 
     String process(OfflinePlayer offlinePlayer, @NotNull String[] params);
-
 }

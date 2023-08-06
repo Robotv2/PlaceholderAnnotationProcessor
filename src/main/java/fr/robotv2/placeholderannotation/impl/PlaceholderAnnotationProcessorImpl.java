@@ -50,7 +50,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
 
         final Method[] methods = basePlaceholderExpansion.getClass().getDeclaredMethods();
 
-        PAPUtil.debug("Register expansion. Found " + methods.length + " methods.");
+        PAPDebug.debug("Register expansion. Found " + methods.length + " methods.");
 
         for(Method method : methods) {
 
@@ -65,6 +65,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
             }
 
             final String identifier = method.getAnnotation(Placeholder.class).identifier();
+
             final BasePlaceholder basePlaceholder = new BasePlaceholderImpl(
                     this,
                     identifier,
@@ -72,7 +73,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
                     method
             );
 
-            PAPUtil.debug("Registering placeholder");
+            PAPDebug.debug("Registering placeholder");
             this.placeholders.put(identifier, basePlaceholder);
         }
     }
@@ -83,14 +84,14 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
         final String identifier = args[0];
 
         if(!placeholders.containsKey(identifier)) {
-            PAPUtil.debug("No identifier found for : " + identifier);
+            PAPDebug.debug("No identifier found for : " + identifier);
             return null;
         }
 
         final BasePlaceholder basePlaceholder = placeholders.get(identifier);
         final String[] paramsArgs = Arrays.copyOfRange(args, 1, args.length);
 
-        PAPUtil.debug("Args Found : " + String.join(", ", paramsArgs));
+        PAPDebug.debug("Args Found : " + String.join(", ", paramsArgs));
 
         return basePlaceholder.process(offlinePlayer, paramsArgs);
     }

@@ -1,14 +1,18 @@
 package fr.robotv2.placeholderannotation.impl;
 
-import fr.robotv2.placeholderannotation.*;
+import fr.robotv2.placeholderannotation.BasePlaceholder;
+import fr.robotv2.placeholderannotation.BasePlaceholderExpansion;
+import fr.robotv2.placeholderannotation.PAPDebug;
+import fr.robotv2.placeholderannotation.PlaceholderAnnotationProcessor;
+import fr.robotv2.placeholderannotation.RequestIssuer;
 import org.bukkit.OfflinePlayer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class BasePlaceholderImpl implements BasePlaceholder {
-
 
     private final PlaceholderAnnotationProcessor processor;
 
@@ -41,25 +45,24 @@ public class BasePlaceholderImpl implements BasePlaceholder {
     @Override
     public String process(OfflinePlayer offlinePlayer, String[] params) {
 
-        // Validate parameters
-        if(params == null) {
-            PAPUtil.debug("params is null");
-            return null;
-        }
-
-        if(params.length != (getTypes().length - 1)) {
-            PAPUtil.debug("param's length and type's length are not the same.");
-            return null;
-        }
-
         // Prepare types and objects
-        final Class<?>[] types = Arrays.copyOfRange(getTypes(), 1, getTypes().length);
-        final Object[] objects = new Object[params.length + 1];
+        final Object[] objects = new Object[getTypes().length];
 
-        objects[0] = new RequestIssuerImpl(offlinePlayer);
+        final boolean hasRequestIssuer = getTypes()[0] != null && getTypes()[0].isAssignableFrom(RequestIssuer.class);
+        final Class<?>[] types = hasRequestIssuer ? Arrays.copyOfRange(getTypes(), 1, getTypes().length) : getTypes();
 
+        if(params.length != types.length) {
+            PAPDebug.debug("param's length and type's length are not the same.");
+            return null;
+        }
+
+        if(hasRequestIssuer) {
+            objects[0] = new RequestIssuerImpl(offlinePlayer);
+        }
+
+        final int startingIndex = hasRequestIssuer ? 1 : 0; // Either 1 or 0 to avoid replacing first element.
         for(int i = 0; i < params.length; i++) {
-            objects[i + 1] = this.processParam(params[i], types[i]);
+            objects[i + startingIndex] = this.processParam(params[i], types[i]);
         }
 
         // Invoke method with expansion class and processed objects
@@ -72,32 +75,16 @@ public class BasePlaceholderImpl implements BasePlaceholder {
         final Object object;
 
         if(type.isEnum()) {
-            object = this.getEnumValue(param, type);
+            object = Enum.valueOf(type.asSubclass(Enum.class), param);
         } else {
-            object = Objects.requireNonNull(
-                    processor.getValueResolver(type),
-                    "resolver couldn't be found for " + param
-            ).resolve(param);
+            object = Objects.requireNonNull
+                    (
+                            processor.getValueResolver(type),
+                            "resolver couldn't be found for " + param
+                    ).resolve(param);
         }
 
         return object;
-    }
-
-    // Get Enum value based on input parameter
-    private Enum<?> getEnumValue(String param, Class<?> type) {
-
-        if(!type.isEnum()) {
-            return null;
-        }
-
-        final Class<? extends Enum> enumType = type.asSubclass(Enum.class);
-        Map<String, Enum<?>> values = new HashMap<>();
-
-        for (Enum<?> enumConstant : enumType.getEnumConstants()) {
-            values.put(enumConstant.name().toLowerCase(), enumConstant);
-        }
-
-        return values.get(param.toLowerCase(Locale.ROOT));
     }
 
     // Invoke method with processed objects and handle potential exceptions

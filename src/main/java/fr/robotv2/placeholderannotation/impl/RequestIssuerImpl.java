@@ -13,22 +13,16 @@ public class RequestIssuerImpl implements RequestIssuer {
         this.offlinePlayer = offlinePlayer;
     }
 
-    public boolean isConsole() {
-        return offlinePlayer == null;
-    }
-
     public boolean isOnlinePlayer() {
-        return !isConsole() &&
-                offlinePlayer.getPlayer() != null &&
-                offlinePlayer.getPlayer().isOnline();
+        return offlinePlayer.getPlayer() != null && offlinePlayer.getPlayer().isOnline();
     }
 
     public boolean isOfflinePlayer() {
-        return !isConsole() && !isOnlinePlayer();
+        return offlinePlayer != null;
     }
 
     @Nullable
-    public Player getOnlinePlayer() {
+    public Player getPlayer() {
         return isOnlinePlayer() ? offlinePlayer.getPlayer() : null;
     }
 

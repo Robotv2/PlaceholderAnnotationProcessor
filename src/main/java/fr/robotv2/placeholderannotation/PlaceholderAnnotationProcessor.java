@@ -11,15 +11,11 @@ public interface PlaceholderAnnotationProcessor {
         return new PlaceholderAnnotationProcessorImpl();
     }
 
-    static Logger logger() {
-        return Logger.getLogger("PAP");
-    }
+    void register(BasePlaceholderExpansion basePlaceholderExpansion);
+
+    String process(OfflinePlayer offlinePlayer, String params);
 
     <T> ValueResolver<T> getValueResolver(Class<T> clazz);
 
     <T> void registerValueResolver(Class<? extends T> clazz, ValueResolver<? extends T> resolver);
-
-    void register(BasePlaceholderExpansion basePlaceholderExpansion);
-
-    String process(OfflinePlayer offlinePlayer, String params);
 }

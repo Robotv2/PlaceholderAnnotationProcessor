@@ -3,6 +3,7 @@ package fr.robotv2.placeholderannotation.impl;
 import fr.robotv2.placeholderannotation.*;
 import fr.robotv2.placeholderannotation.annotations.Placeholder;
 import fr.robotv2.placeholderannotation.ValueResolver;
+import fr.robotv2.placeholderannotation.util.PAPDebug;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -50,8 +51,6 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
 
         final Method[] methods = basePlaceholderExpansion.getClass().getDeclaredMethods();
 
-        PAPDebug.debug("Register expansion. Found " + methods.length + " methods.");
-
         for(Method method : methods) {
 
             if(!method.isAnnotationPresent(Placeholder.class)) {
@@ -73,11 +72,12 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
                     method
             );
 
-            PAPDebug.debug("Registering placeholder");
+            PAPDebug.debug("Registering placeholder with identifier: " + identifier);
             this.placeholders.put(identifier, basePlaceholder);
         }
     }
 
+    @Override
     public String process(OfflinePlayer offlinePlayer, String params) {
 
         final String[] args = params.split("_");
@@ -92,7 +92,6 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
         final String[] paramsArgs = Arrays.copyOfRange(args, 1, args.length);
 
         PAPDebug.debug("Args Found : " + String.join(", ", paramsArgs));
-
         return basePlaceholder.process(offlinePlayer, paramsArgs);
     }
 
@@ -113,15 +112,15 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
     }
 
     private void registerDefaultValueResolver() {
-        resolvers.put(String.class, (ValueResolver<String>) param -> param);
-        resolvers.put(Integer.class, (ValueResolver<Integer>) param -> new BigInteger(param).intValue());
-        resolvers.put(Long.class, (ValueResolver<Long>) param -> new BigInteger(param).longValue());
-        resolvers.put(Double.class, (ValueResolver<Double>) param -> new BigDecimal(param).doubleValue());
-        resolvers.put(Float.class, (ValueResolver<Float>) param -> new BigDecimal(param).floatValue());
-        resolvers.put(Byte.class, (ValueResolver<Byte>) param -> new BigInteger(param).byteValueExact());
-        resolvers.put(Void.class, (ValueResolver<Void>) param -> null);
-        resolvers.put(Player.class, (ValueResolver<Player>) Bukkit::getPlayer);
-        resolvers.put(OfflinePlayer.class, (ValueResolver<OfflinePlayer>) param -> {
+        resolvers.put(String.class, (ValueResolver<String>) (issuer, param) -> param);
+        resolvers.put(Integer.class, (ValueResolver<Integer>) (issuer, param) -> new BigInteger(param).intValue());
+        resolvers.put(Long.class, (ValueResolver<Long>) (issuer, param) -> new BigInteger(param).longValue());
+        resolvers.put(Double.class, (ValueResolver<Double>) (issuer, param) -> new BigDecimal(param).doubleValue());
+        resolvers.put(Float.class, (ValueResolver<Float>) (issuer, param) -> new BigDecimal(param).floatValue());
+        resolvers.put(Byte.class, (ValueResolver<Byte>) (issuer, param) -> new BigInteger(param).byteValueExact());
+        resolvers.put(Void.class, (ValueResolver<Void>) (issuer, param) -> null);
+        resolvers.put(Player.class, (ValueResolver<Player>) (issuer, param) -> Bukkit.getPlayer(param));
+        resolvers.put(OfflinePlayer.class, (ValueResolver<OfflinePlayer>) (issuer, param) -> {
             final Player player = Bukkit.getPlayer(param);
             if(player != null && player.isOnline()) {
                 return player;
@@ -130,6 +129,6 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
                 return offlinePlayer.hasPlayedBefore() ? offlinePlayer : null;
             }
         });
-        resolvers.put(World.class, Bukkit::getWorld);
+        resolvers.put(World.class, (issuer, param) -> Bukkit.getWorld(param));
     }
 }

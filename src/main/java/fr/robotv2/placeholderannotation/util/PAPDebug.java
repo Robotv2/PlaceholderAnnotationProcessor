@@ -1,4 +1,6 @@
-package fr.robotv2.placeholderannotation;
+package fr.robotv2.placeholderannotation.util;
+
+import org.bukkit.plugin.PluginLogger;
 
 public class PAPDebug {
 
@@ -10,7 +12,7 @@ public class PAPDebug {
 
     public static void debug(String message) {
         if(PAPDebug.debug) {
-            PlaceholderAnnotationProcessor.logger().info(message);
+            PluginLogger.getLogger("PAP").info(message);
         }
     }
 }

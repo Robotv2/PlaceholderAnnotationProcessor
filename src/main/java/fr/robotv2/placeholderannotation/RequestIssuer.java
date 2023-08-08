@@ -7,28 +7,31 @@ import org.jetbrains.annotations.Nullable;
 public interface RequestIssuer {
 
     /**
-     * @return whether an offline player instance has been given.
-     */
-    boolean isConsole();
-
-    /**
-     * @return whether an actually valid online player has been given.
+     * Checks if the player is online.
+     *
+     * @return true if the associated OfflinePlayer has an online player, false otherwise.
      */
     boolean isOnlinePlayer();
 
     /**
-     * @return whether an actually valid offline player has been given.
+     * Checks if a valid OfflinePlayer instance has been given.
+     *
+     * @return true if the associated OfflinePlayer exists, false otherwise.
      */
     boolean isOfflinePlayer();
 
     /**
-     * @return the online player object. null if no currently online player could be found.
+     * Provides the online associated player.
+     *
+     * @return Online Player if it exists and is online, otherwise null.
      */
     @Nullable
-    Player getOnlinePlayer();
+    Player getPlayer();
 
     /**
-     * @return the offline player object. null if no offline player could be found.
+     * Provides the offline player given by PlaceholderAPI
+     *
+     * @return OfflinePlayer associated with the instance.
      */
     @Nullable
     OfflinePlayer getOfflinePlayer();

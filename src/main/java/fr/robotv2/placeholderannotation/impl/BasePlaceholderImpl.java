@@ -2,7 +2,8 @@ package fr.robotv2.placeholderannotation.impl;
 
 import fr.robotv2.placeholderannotation.BasePlaceholder;
 import fr.robotv2.placeholderannotation.BasePlaceholderExpansion;
-import fr.robotv2.placeholderannotation.PAPDebug;
+import fr.robotv2.placeholderannotation.annotations.RequirePlayer;
+import fr.robotv2.placeholderannotation.util.PAPDebug;
 import fr.robotv2.placeholderannotation.PlaceholderAnnotationProcessor;
 import fr.robotv2.placeholderannotation.RequestIssuer;
 import org.bukkit.OfflinePlayer;
@@ -56,13 +57,21 @@ public class BasePlaceholderImpl implements BasePlaceholder {
             return null;
         }
 
+        final RequestIssuer issuer = new RequestIssuerImpl(offlinePlayer);
+
+        if(method.isAnnotationPresent(RequirePlayer.class)) {
+            if(!issuer.isOnlinePlayer()) {
+                return null;
+            }
+        }
+
         if(hasRequestIssuer) {
-            objects[0] = new RequestIssuerImpl(offlinePlayer);
+            objects[0] = issuer;
         }
 
         final int startingIndex = hasRequestIssuer ? 1 : 0; // Either 1 or 0 to avoid replacing first element.
         for(int i = 0; i < params.length; i++) {
-            objects[i + startingIndex] = this.processParam(params[i], types[i]);
+            objects[i + startingIndex] = this.processParam(issuer, params[i], types[i]);
         }
 
         // Invoke method with expansion class and processed objects
@@ -70,18 +79,17 @@ public class BasePlaceholderImpl implements BasePlaceholder {
     }
 
     // Process individual parameter into corresponding object
-    private Object processParam(String param, Class<?> type) {
+    private Object processParam(RequestIssuer issuer, String param, Class<?> type) {
 
         final Object object;
 
         if(type.isEnum()) {
             object = Enum.valueOf(type.asSubclass(Enum.class), param);
         } else {
-            object = Objects.requireNonNull
-                    (
+            object = Objects.requireNonNull(
                             processor.getValueResolver(type),
                             "resolver couldn't be found for " + param
-                    ).resolve(param);
+            ).resolve(issuer, param);
         }
 
         return object;

@@ -1,6 +1,7 @@
 package fr.robotv2.placeholderannotation.impl;
 
 import fr.robotv2.placeholderannotation.*;
+import fr.robotv2.placeholderannotation.annotations.DefaultPlaceholder;
 import fr.robotv2.placeholderannotation.annotations.Placeholder;
 import fr.robotv2.placeholderannotation.ValueResolver;
 import fr.robotv2.placeholderannotation.util.PAPDebug;
@@ -19,6 +20,8 @@ import java.util.Map;
 public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotationProcessor{
 
     private final Map<Class<?>, ValueResolver<?>> resolvers = new HashMap<>();
+
+    private BasePlaceholder defaultPlaceholder = null;
     private final Map<String, BasePlaceholder> placeholders = new HashMap<>();
 
     public PlaceholderAnnotationProcessorImpl() {
@@ -47,7 +50,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
     }
 
     @Override
-    public void register(BasePlaceholderExpansion basePlaceholderExpansion) {
+    public void registerExpansion(BasePlaceholderExpansion basePlaceholderExpansion) {
 
         final Method[] methods = basePlaceholderExpansion.getClass().getDeclaredMethods();
 
@@ -72,6 +75,14 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
                     method
             );
 
+            if(method.isAnnotationPresent(DefaultPlaceholder.class)) {
+                if(defaultPlaceholder == null) {
+                    this.defaultPlaceholder = basePlaceholder;
+                } else {
+                    throw new IllegalStateException("only one method can have the annotation @DefaultPlaceholder.");
+                }
+            }
+
             PAPDebug.debug("Registering placeholder with identifier: " + identifier);
             this.placeholders.put(identifier, basePlaceholder);
         }
@@ -83,13 +94,18 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
         final String[] args = params.split("_");
         final String identifier = args[0];
 
-        if(!placeholders.containsKey(identifier)) {
-            PAPDebug.debug("No identifier found for : " + identifier);
+        final BasePlaceholder basePlaceholder;
+        final String[] paramsArgs;
+
+        if(placeholders.containsKey(identifier)) {
+            basePlaceholder = placeholders.get(identifier);
+            paramsArgs = Arrays.copyOfRange(args, 1, args.length);
+        } else if(defaultPlaceholder != null) {
+            basePlaceholder = defaultPlaceholder;
+            paramsArgs = args;
+        } else {
             return null;
         }
-
-        final BasePlaceholder basePlaceholder = placeholders.get(identifier);
-        final String[] paramsArgs = Arrays.copyOfRange(args, 1, args.length);
 
         PAPDebug.debug("Args Found : " + String.join(", ", paramsArgs));
         return basePlaceholder.process(offlinePlayer, paramsArgs);

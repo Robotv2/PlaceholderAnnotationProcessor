@@ -11,7 +11,7 @@ public interface PlaceholderAnnotationProcessor {
         return new PlaceholderAnnotationProcessorImpl();
     }
 
-    void register(BasePlaceholderExpansion basePlaceholderExpansion);
+    void registerExpansion(BasePlaceholderExpansion basePlaceholderExpansion);
 
     String process(OfflinePlayer offlinePlayer, String params);
 

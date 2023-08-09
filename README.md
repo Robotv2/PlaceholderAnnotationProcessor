@@ -34,11 +34,6 @@ This class has the same properties than the 'PlaceholderExpansion' class from Pl
 @RequireOnlinePlayer
 public String onDone(RequestIssuer issuer) {
     final QuestPlayer questPlayer = QuestPlayer.getQuestPlayer(issuer.getPlayer().getUniqueId());
-
-    if(questPlayer == null) {
-        return null;
-    }
-
     return String.valueOf(questPlayer.getNumberOfQuestsDone());
 }
 
@@ -47,11 +42,7 @@ public String onDone(RequestIssuer issuer) {
 @RequireOnlinePlayer
 public String onQuest(RequestIssuer issuer, String serviceId, Integer index, @Optional(defaultArg = "display") String param) {
 
-    final QuestPlayer questPlayer = QuestPlayer.getQuestPlayer(issuer.getPlayer().getUniqueId());
-    if(questPlayer == null) {
-        return null;
-    }
-        
+    final QuestPlayer questPlayer = QuestPlayer.getQuestPlayer(issuer.getPlayer().getUniqueId());        
     final List<ActiveQuest> activeQuests = questPlayer.getActiveQuests(serviceId);
 
     if(activeQuests.size() <= index) {
@@ -78,7 +69,7 @@ public String onQuest(RequestIssuer issuer, String serviceId, Integer index, @Op
     }
 ```
 
-**Finally, register your expansion to the PlaceholderAnnotationProcessor AND PlaceholderAPI**
+**Finally, register your expansion to PlaceholderAnnotationProcessor AND PlaceholderAPI**
 
 ```java
 MyCustomPlaceholder myCustomPlaceholder = new MyCustomPlaceholder(processor);
@@ -86,7 +77,7 @@ processor.registerExpansion(clipPlaceholder);
 myCustomPlaceholder.register();
 ```
 
-And Your Done !
+**And Your Done !**
 
 
 ## Installation

@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class BasePlaceholderImpl implements BasePlaceholder {
 
@@ -119,8 +120,10 @@ public class BasePlaceholderImpl implements BasePlaceholder {
             }
 
             return (String) result;
-        } catch (IllegalAccessException | InvocationTargetException | ClassCastException exception) {
-            exception.printStackTrace();
+        } catch (IllegalAccessException | ClassCastException exception) {
+            PlaceholderAnnotationProcessor.getLogger().log(Level.SEVERE, "An exception occurred: ", exception);
+        } catch (InvocationTargetException exception) {
+            PlaceholderAnnotationProcessor.getLogger().log(Level.SEVERE, "An error occurred during the invocation of method: " + method.getName(), exception);
         }
 
         return null;

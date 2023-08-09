@@ -73,7 +73,7 @@ public String onQuest(RequestIssuer issuer, String serviceId, Integer index, @Op
 
 ```java
 MyCustomPlaceholder myCustomPlaceholder = new MyCustomPlaceholder(processor);
-processor.registerExpansion(clipPlaceholder);
+processor.registerExpansion(myCustomPlaceholder);
 myCustomPlaceholder.register();
 ```
 

@@ -3,7 +3,6 @@ package fr.robotv2.placeholderannotation.impl;
 import fr.robotv2.placeholderannotation.*;
 import fr.robotv2.placeholderannotation.annotations.DefaultPlaceholder;
 import fr.robotv2.placeholderannotation.annotations.Placeholder;
-import fr.robotv2.placeholderannotation.ValueResolver;
 import fr.robotv2.placeholderannotation.util.PAPDebug;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -11,8 +10,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,17 +53,20 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
 
         for(Method method : methods) {
 
-            if(!method.isAnnotationPresent(Placeholder.class)) {
+            if(!method.isAnnotationPresent(Placeholder.class)
+                    && method.isAnnotationPresent(DefaultPlaceholder.class)) {
                 continue;
             }
 
             final Class<?>[] types = method.getParameterTypes();
 
             for(Class<?> type : types) {
-                checkType(type);
+                checkType(type, method);
             }
 
-            final String identifier = method.getAnnotation(Placeholder.class).identifier();
+            final String identifier =
+                    method.isAnnotationPresent(Placeholder.class) ?
+                    method.getAnnotation(Placeholder.class).identifier() : "";
 
             final BasePlaceholder basePlaceholder = new BasePlaceholderImpl(
                     this,
@@ -112,14 +112,15 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
     }
 
 
-    private void checkType(Class<?> type) {
+    private void checkType(Class<?> type, Method method) {
 
         if(type == RequestIssuer.class) {
             return;
         }
 
         if(type.isPrimitive()) {
-            throw new IllegalArgumentException("PAP does not support primitive types.");
+            PlaceholderAnnotationProcessor.getLogger().warning("primitive types (" + type.getSimpleName() + " ) has been found on method " + method.getName());
+            PlaceholderAnnotationProcessor.getLogger().warning("Primitive types are supported but are not recommended. Please consider switching with their wrapper object instead.");
         }
 
         if(this.getValueResolver(type) == null && !type.isEnum()) {
@@ -129,12 +130,15 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
 
     private void registerDefaultValueResolver() {
         resolvers.put(String.class, (ValueResolver<String>) (issuer, param) -> param);
-        resolvers.put(Integer.class, (ValueResolver<Integer>) (issuer, param) -> new BigInteger(param).intValue());
-        resolvers.put(Long.class, (ValueResolver<Long>) (issuer, param) -> new BigInteger(param).longValue());
-        resolvers.put(Double.class, (ValueResolver<Double>) (issuer, param) -> new BigDecimal(param).doubleValue());
-        resolvers.put(Float.class, (ValueResolver<Float>) (issuer, param) -> new BigDecimal(param).floatValue());
-        resolvers.put(Byte.class, (ValueResolver<Byte>) (issuer, param) -> new BigInteger(param).byteValueExact());
+        resolvers.put(Integer.class, (ValueResolver<Integer>) (issuer, param) -> Integer.parseInt(param));
+        resolvers.put(Long.class, (ValueResolver<Long>) (issuer, param) -> Long.parseLong(param));
+        resolvers.put(Double.class, (ValueResolver<Double>) (issuer, param) -> Double.parseDouble(param));
+        resolvers.put(Float.class, (ValueResolver<Float>) (issuer, param) -> Float.parseFloat(param));
+        resolvers.put(Byte.class, (ValueResolver<Byte>) (issuer, param) -> Byte.parseByte(param));
         resolvers.put(Void.class, (ValueResolver<Void>) (issuer, param) -> null);
+        resolvers.put(Boolean.class, (ValueResolver<Boolean>) (issuer, param) -> Boolean.parseBoolean(param));
+        resolvers.put(Character.class, (ValueResolver<Character>) (issuer, param) -> param.charAt(0));
+        resolvers.put(Short.class, (ValueResolver<Short>) (issuer, param) -> Short.parseShort(param));
         resolvers.put(Player.class, (ValueResolver<Player>) (issuer, param) -> Bukkit.getPlayer(param));
         resolvers.put(OfflinePlayer.class, (ValueResolver<OfflinePlayer>) (issuer, param) -> {
             final Player player = Bukkit.getPlayer(param);

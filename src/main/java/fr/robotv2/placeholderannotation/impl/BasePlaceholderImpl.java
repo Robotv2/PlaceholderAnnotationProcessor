@@ -2,16 +2,17 @@ package fr.robotv2.placeholderannotation.impl;
 
 import fr.robotv2.placeholderannotation.BasePlaceholder;
 import fr.robotv2.placeholderannotation.BasePlaceholderExpansion;
+import fr.robotv2.placeholderannotation.PlaceholderAnnotationProcessor;
+import fr.robotv2.placeholderannotation.RequestIssuer;
 import fr.robotv2.placeholderannotation.annotations.Optional;
 import fr.robotv2.placeholderannotation.annotations.RequireOnlinePlayer;
 import fr.robotv2.placeholderannotation.util.PAPDebug;
-import fr.robotv2.placeholderannotation.PlaceholderAnnotationProcessor;
-import fr.robotv2.placeholderannotation.RequestIssuer;
 import org.bukkit.OfflinePlayer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.logging.Level;
 
@@ -57,7 +58,8 @@ public class BasePlaceholderImpl implements BasePlaceholder {
         final Class<?>[] types = hasRequestIssuer ? Arrays.copyOfRange(methodTypes, 1, methodTypes.length) : methodTypes;
         final RequestIssuer issuer = new RequestIssuerImpl(offlinePlayer);
 
-        if(method.isAnnotationPresent(RequireOnlinePlayer.class) && !issuer.isOnlinePlayer()) {
+        if(method.isAnnotationPresent(RequireOnlinePlayer.class)
+                && !issuer.isOnlinePlayer()) {
             return null;
         }
 
@@ -69,8 +71,12 @@ public class BasePlaceholderImpl implements BasePlaceholder {
 
         for(int i = 0; i < types.length; i++) {
 
-            final Class<?> type = Objects.requireNonNull(types[i]);
+            Class<?> type = Objects.requireNonNull(types[i]);
             Object object = null;
+
+            if(type.isPrimitive()) {
+                type = fromPrimitiveToWrapper(type);
+            }
 
             if(i < params.length) {
 
@@ -79,7 +85,7 @@ public class BasePlaceholderImpl implements BasePlaceholder {
             } else if(type.isAnnotationPresent(Optional.class)) {
 
                 final Optional optionalAnnotation = type.getAnnotation(Optional.class);
-                final String defaultArg = optionalAnnotation.defaultArg();
+                final String defaultArg = optionalAnnotation.defaultP();
 
                 if(defaultArg != null && !defaultArg.isEmpty()) {
                     object = this.processParam(issuer, defaultArg, type);
@@ -102,7 +108,7 @@ public class BasePlaceholderImpl implements BasePlaceholder {
     // Process individual parameter into corresponding object
     private Object processParam(RequestIssuer issuer, String param, Class<?> type) {
         return type.isEnum()
-                ? Enum.valueOf(type.asSubclass(Enum.class), param)
+                ? Enum.valueOf(type.asSubclass(Enum.class), param.toUpperCase(Locale.ROOT))
                 : Objects.requireNonNull(processor.getValueResolver(type)).resolve(issuer, param);
     }
 
@@ -115,11 +121,7 @@ public class BasePlaceholderImpl implements BasePlaceholder {
                 return null;
             }
 
-            if(!result.getClass().isAssignableFrom(String.class)) {
-                throw new IllegalStateException(method.getName() + " return type is not a string. found: " + result.getClass().getSimpleName());
-            }
-
-            return (String) result;
+            return result.getClass().isAssignableFrom(String.class) ? (String) result : result.toString();
         } catch (IllegalAccessException | ClassCastException exception) {
             PlaceholderAnnotationProcessor.getLogger().log(Level.SEVERE, "An exception occurred: ", exception);
         } catch (InvocationTargetException exception) {
@@ -127,5 +129,34 @@ public class BasePlaceholderImpl implements BasePlaceholder {
         }
 
         return null;
+    }
+
+    private Class<?> fromPrimitiveToWrapper(Class<?> primitive) {
+
+        if (!primitive.isPrimitive()) {
+            return primitive;
+        }
+
+        if (primitive.equals(boolean.class)) {
+            return Boolean.class;
+        } else if (primitive.equals(int.class)) {
+            return Integer.class;
+        } else if (primitive.equals(long.class)) {
+            return Long.class;
+        } else if (primitive.equals(double.class)) {
+            return Double.class;
+        } else if (primitive.equals(float.class)) {
+            return Float.class;
+        } else if (primitive.equals(byte.class)) {
+            return Byte.class;
+        } else if (primitive.equals(char.class)) {
+            return Character.class;
+        } else if (primitive.equals(short.class)) {
+            return Short.class;
+        } else if (primitive.equals(void.class)) {
+            return Void.class;
+        } else {
+            throw new IllegalArgumentException("Class " + primitive + " is not a primitive type");
+        }
     }
 }

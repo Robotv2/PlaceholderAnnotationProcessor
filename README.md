@@ -4,6 +4,7 @@
 PAP (Placeholder Annotation Processor) intends to simplify the creation of placeholders for Minecraft Plugin Developers.
 
 This project draws inspiration from similar project like [ACF](https://github.com/aikar/commands) or [Lamp](https://github.com/Revxrsal/lamp).
+
 This plugin is, for now, only working with [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/#:~:text=PlaceholderAPI%20is%20a%20plugin%20for%20Spigot%20servers%20that,be%20downloaded%20in-game%20through%20the%20PAPI%20Expansion%20Cloud.) but is intended to work with other plugins in the future.
 
 

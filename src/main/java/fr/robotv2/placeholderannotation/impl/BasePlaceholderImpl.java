@@ -85,7 +85,7 @@ public class BasePlaceholderImpl implements BasePlaceholder {
             } else if(type.isAnnotationPresent(Optional.class)) {
 
                 final Optional optionalAnnotation = type.getAnnotation(Optional.class);
-                final String defaultArg = optionalAnnotation.defaultP();
+                final String defaultArg = optionalAnnotation.defaultParameter();
 
                 if(defaultArg != null && !defaultArg.isEmpty()) {
                     object = this.processParam(issuer, defaultArg, type);

@@ -1,5 +1,6 @@
 package fr.robotv2.placeholderannotation.impl;
 
+import com.sun.tools.javac.util.Pair;
 import fr.robotv2.placeholderannotation.BasePlaceholder;
 import fr.robotv2.placeholderannotation.BasePlaceholderExpansion;
 import fr.robotv2.placeholderannotation.PlaceholderAnnotationProcessor;
@@ -11,9 +12,7 @@ import org.bukkit.OfflinePlayer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 
 public class BasePlaceholderImpl implements BasePlaceholder {
@@ -57,11 +56,6 @@ public class BasePlaceholderImpl implements BasePlaceholder {
 
         final Class<?>[] types = hasRequestIssuer ? Arrays.copyOfRange(methodTypes, 1, methodTypes.length) : methodTypes;
         final RequestIssuer issuer = new RequestIssuerImpl(offlinePlayer);
-
-        if(method.isAnnotationPresent(RequireOnlinePlayer.class)
-                && !issuer.isOnlinePlayer()) {
-            return null;
-        }
 
         if(hasRequestIssuer) {
             processedObjects[0] = issuer;

@@ -1,8 +1,11 @@
 package fr.robotv2.placeholderannotation.impl;
 
 import fr.robotv2.placeholderannotation.*;
+import fr.robotv2.placeholderannotation.annotations.Cache;
 import fr.robotv2.placeholderannotation.annotations.DefaultPlaceholder;
 import fr.robotv2.placeholderannotation.annotations.Placeholder;
+import fr.robotv2.placeholderannotation.annotations.RequireOnlinePlayer;
+import fr.robotv2.placeholderannotation.util.CacheSystem;
 import fr.robotv2.placeholderannotation.util.PAPDebug;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -13,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotationProcessor{
 
@@ -108,6 +112,31 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
         }
 
         PAPDebug.debug("Args Found : " + String.join(", ", paramsArgs));
+        final Method method = basePlaceholder.getMethod();
+
+        if(method.isAnnotationPresent(RequireOnlinePlayer.class)
+                && (offlinePlayer.getPlayer() == null || !offlinePlayer.getPlayer().isOnline())) {
+            return null;
+        }
+
+        if(method.isAnnotationPresent(Cache.class)) {
+
+            final UUID targetUUID = offlinePlayer.getUniqueId();
+
+            if(CacheSystem.INSTANCE.isCached(targetUUID, params)) {
+                return CacheSystem.INSTANCE.getCache(targetUUID, params);
+            }
+
+            final Cache cache = method.getAnnotation(Cache.class);
+            final String result = basePlaceholder.process(offlinePlayer, paramsArgs);
+
+            if(result != null) {
+                CacheSystem.INSTANCE.cache(targetUUID, params, result, cache);
+            }
+
+            return result;
+        }
+
         return basePlaceholder.process(offlinePlayer, paramsArgs);
     }
 

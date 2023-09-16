@@ -153,7 +153,7 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
         }
 
         if(this.getValueResolver(type) == null && !type.isEnum()) {
-            throw new NullPointerException("No resolver found for type class: " + type.getSimpleName());
+            throw new NullPointerException(String.format("No resolver found for type class '%s' in method: %s", type.getSimpleName(), method.getName()));
         }
     }
 

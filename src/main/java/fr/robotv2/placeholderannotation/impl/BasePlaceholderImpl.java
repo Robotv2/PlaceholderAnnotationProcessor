@@ -1,18 +1,18 @@
 package fr.robotv2.placeholderannotation.impl;
 
-import com.sun.tools.javac.util.Pair;
 import fr.robotv2.placeholderannotation.BasePlaceholder;
 import fr.robotv2.placeholderannotation.BasePlaceholderExpansion;
 import fr.robotv2.placeholderannotation.PlaceholderAnnotationProcessor;
 import fr.robotv2.placeholderannotation.RequestIssuer;
 import fr.robotv2.placeholderannotation.annotations.Optional;
-import fr.robotv2.placeholderannotation.annotations.RequireOnlinePlayer;
 import fr.robotv2.placeholderannotation.util.PAPDebug;
 import org.bukkit.OfflinePlayer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class BasePlaceholderImpl implements BasePlaceholder {

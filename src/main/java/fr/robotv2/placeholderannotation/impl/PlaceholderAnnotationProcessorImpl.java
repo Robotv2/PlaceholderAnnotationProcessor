@@ -57,8 +57,8 @@ public class PlaceholderAnnotationProcessorImpl implements PlaceholderAnnotation
 
         for(Method method : methods) {
 
-            if(!method.isAnnotationPresent(Placeholder.class)
-                    && method.isAnnotationPresent(DefaultPlaceholder.class)) {
+            if(!method.isAnnotationPresent(Placeholder.class) &&
+                    !method.isAnnotationPresent(DefaultPlaceholder.class)) {
                 continue;
             }
 

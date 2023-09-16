@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -57,11 +56,11 @@ public enum CacheSystem {
     }
 
     public String getCache(UUID uuid, String placeholder) {
-        return this.cache.get(new Pair<>(uuid, placeholder));
+        return this.cache.get(Pair.of(uuid, placeholder));
     }
 
     public void cache(UUID uuid, String placeholder, String result, Cache cache) {
-        final Pair<UUID, String> keyPair = new Pair<>(uuid, placeholder);
+        final Pair<UUID, String> keyPair = Pair.of(uuid, placeholder);
         this.cache.put(keyPair, result);
         this.CACHE_POOL.schedule(() -> this.cache.remove(keyPair), cache.value(), cache.unit());
     }

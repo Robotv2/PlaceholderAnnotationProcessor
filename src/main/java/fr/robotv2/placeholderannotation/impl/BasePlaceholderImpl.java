@@ -8,6 +8,8 @@ import fr.robotv2.placeholderannotation.annotations.Optional;
 import fr.robotv2.placeholderannotation.util.PAPDebug;
 import org.bukkit.OfflinePlayer;
 
+import javax.annotation.Nullable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -72,13 +74,14 @@ public class BasePlaceholderImpl implements BasePlaceholder {
                 type = fromPrimitiveToWrapper(type);
             }
 
+            final Optional optionalAnnotation = getAnnotation(method, i, Optional.class);
+
             if(i < params.length) {
 
                 object = this.processParam(issuer, params[i], type);
 
-            } else if(type.isAnnotationPresent(Optional.class)) {
+            } else if(optionalAnnotation != null) {
 
-                final Optional optionalAnnotation = type.getAnnotation(Optional.class);
                 final String defaultArg = optionalAnnotation.defaultParameter();
 
                 if(defaultArg != null && !defaultArg.isEmpty()) {
@@ -152,5 +155,23 @@ public class BasePlaceholderImpl implements BasePlaceholder {
         } else {
             throw new IllegalArgumentException("Class " + primitive + " is not a primitive type");
         }
+    }
+
+    @Nullable
+    private <T extends Annotation> T getAnnotation(Method method, int paramIndex, Class<T> clazz) {
+
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+
+        if (paramIndex < 0 || paramIndex >= parameterAnnotations.length) {
+            return null;
+        }
+
+        for (Annotation annotation : parameterAnnotations[paramIndex]) {
+            if (clazz.isInstance(annotation)) {
+                return clazz.cast(annotation);
+            }
+        }
+
+        return null;
     }
 }

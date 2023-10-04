@@ -74,7 +74,7 @@ public class BasePlaceholderImpl implements BasePlaceholder {
                 type = fromPrimitiveToWrapper(type);
             }
 
-            final Optional optionalAnnotation = getAnnotation(method, i, Optional.class);
+            final Optional optionalAnnotation = getAnnotation(method, i + startingIndex, Optional.class);
 
             if(i < params.length) {
 
@@ -91,7 +91,7 @@ public class BasePlaceholderImpl implements BasePlaceholder {
                 }
 
             } else {
-                PAPDebug.debug("Missing argument for " + method.getName() + " method. Need " + getTypes().length + " parameter(s) - Found " + params.length + " parameter(s).");
+                PAPDebug.debug("Missing argument for " + method.getName() + " method. Need " + types.length + " parameter(s) - Found " + params.length + " parameter(s).");
                 return null;
             }
 
